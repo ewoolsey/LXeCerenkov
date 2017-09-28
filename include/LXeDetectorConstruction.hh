@@ -23,38 +23,37 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1SteppingAction.hh 74483 2013-10-09 13:37:06Z gcosmo $
+// $Id: LXeDetectorConstruction.hh 69565 2013-05-08 12:35:31Z gcosmo $
 //
-/// \file B1SteppingAction.hh
-/// \brief Definition of the B1SteppingAction class
+/// \file LXeDetectorConstruction.hh
+/// \brief Definition of the LXeDetectorConstruction class
 
-#ifndef B1SteppingAction_h
-#define B1SteppingAction_h 1
+#ifndef LXeDetectorConstruction_h
+#define LXeDetectorConstruction_h 1
 
-#include "G4UserSteppingAction.hh"
+#include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 
-class B1EventAction;
-
+class G4VPhysicalVolume;
 class G4LogicalVolume;
 
-/// Stepping action class
-/// 
+/// Detector construction class to define materials and geometry.
 
-class B1SteppingAction : public G4UserSteppingAction
+class LXeDetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    B1SteppingAction(B1EventAction* eventAction);
-    virtual ~B1SteppingAction();
+    LXeDetectorConstruction();
+    virtual ~LXeDetectorConstruction();
 
-    // method from the base class
-    virtual void UserSteppingAction(const G4Step*);
+    virtual G4VPhysicalVolume* Construct();
+    
+    G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
 
-  private:
-    B1EventAction*  fEventAction;
-    G4LogicalVolume* fScoringVolume;
+  protected:
+    G4LogicalVolume*  fScoringVolume;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+

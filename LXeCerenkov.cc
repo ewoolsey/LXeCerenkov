@@ -27,8 +27,8 @@
 //
 /// \file LXeCerenkov.cc
 
-#include "B1DetectorConstruction.hh"
-#include "B1ActionInitialization.hh"
+#include "LXeDetectorConstruction.hh"
+#include "LXeActionInitialization.hh"
 
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
@@ -70,7 +70,7 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new B1DetectorConstruction());
+  runManager->SetUserInitialization(new LXeDetectorConstruction());
 
   // Physics list
   G4VModularPhysicsList* physicsList = new QBBC;
@@ -78,7 +78,7 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(physicsList);
     
   // User action initialization
-  runManager->SetUserInitialization(new B1ActionInitialization());
+  runManager->SetUserInitialization(new LXeActionInitialization());
   
   // Initialize visualization
   //

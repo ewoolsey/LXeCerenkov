@@ -23,42 +23,49 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1RunAction.hh 99560 2016-09-27 07:03:29Z gcosmo $
+// $Id: LXeActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
 //
-/// \file B1RunAction.hh
-/// \brief Definition of the B1RunAction class
+/// \file LXeActionInitialization.cc
+/// \brief Implementation of the LXeActionInitialization class
 
-#ifndef B1RunAction_h
-#define B1RunAction_h 1
+#include "LXeActionInitialization.hh"
+#include "LXePrimaryGeneratorAction.hh"
+#include "LXeRunAction.hh"
+#include "LXeEventAction.hh"
+#include "LXeSteppingAction.hh"
 
-#include "G4UserRunAction.hh"
-#include "G4Accumulable.hh"
-#include "globals.hh"
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class G4Run;
+LXeActionInitialization::LXeActionInitialization()
+ : G4VUserActionInitialization()
+{}
 
-/// Run action class
-///
-/// In EndOfRunAction(), it calculates the dose in the selected volume 
-/// from the energy deposit accumulated via stepping and event actions.
-/// The computed dose is then printed on the screen.
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class B1RunAction : public G4UserRunAction
+LXeActionInitialization::~LXeActionInitialization()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void LXeActionInitialization::BuildForMaster() const
 {
-  public:
-    B1RunAction();
-    virtual ~B1RunAction();
+  LXeRunAction* runAction = new LXeRunAction;
+  SetUserAction(runAction);
+}
 
-    // virtual G4Run* GenerateRun();
-    virtual void BeginOfRunAction(const G4Run*);
-    virtual void   EndOfRunAction(const G4Run*);
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-    void AddEdep (G4double edep); 
+void LXeActionInitialization::Build() const
+{
+  SetUserAction(new LXePrimaryGeneratorAction);
 
-  private:
-    G4Accumulable<G4double> fEdep;
-    G4Accumulable<G4double> fEdep2;
-};
+  LXeRunAction* runAction = new LXeRunAction;
+  SetUserAction(runAction);
+  
+  LXeEventAction* eventAction = new LXeEventAction(runAction);
+  SetUserAction(eventAction);
+  
+  SetUserAction(new LXeSteppingAction(eventAction));
+}  
 
-#endif
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

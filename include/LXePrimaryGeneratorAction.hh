@@ -23,49 +23,44 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1ActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id: LXePrimaryGeneratorAction.hh 90623 2015-06-05 09:24:30Z gcosmo $
 //
-/// \file B1ActionInitialization.cc
-/// \brief Implementation of the B1ActionInitialization class
+/// \file LXePrimaryGeneratorAction.hh
+/// \brief Definition of the LXePrimaryGeneratorAction class
 
-#include "B1ActionInitialization.hh"
-#include "B1PrimaryGeneratorAction.hh"
-#include "B1RunAction.hh"
-#include "B1EventAction.hh"
-#include "B1SteppingAction.hh"
+#ifndef LXePrimaryGeneratorAction_h
+#define LXePrimaryGeneratorAction_h 1
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4ParticleGun.hh"
+#include "globals.hh"
 
-B1ActionInitialization::B1ActionInitialization()
- : G4VUserActionInitialization()
-{}
+class G4ParticleGun;
+class G4Event;
+class G4Box;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+/// The primary generator action class with particle gun.
+///
+/// The default kinematic is a 6 MeV gamma, randomly distribued 
+/// in front of the phantom across 80% of the (X,Y) phantom size.
 
-B1ActionInitialization::~B1ActionInitialization()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void B1ActionInitialization::BuildForMaster() const
+class LXePrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  B1RunAction* runAction = new B1RunAction;
-  SetUserAction(runAction);
-}
+  public:
+    LXePrimaryGeneratorAction();    
+    virtual ~LXePrimaryGeneratorAction();
+
+    // method from the base class
+    virtual void GeneratePrimaries(G4Event*);         
+  
+    // method to access particle gun
+    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+  
+  private:
+    G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
+    G4Box* fEnvelopeBox;
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1ActionInitialization::Build() const
-{
-  SetUserAction(new B1PrimaryGeneratorAction);
-
-  B1RunAction* runAction = new B1RunAction;
-  SetUserAction(runAction);
-  
-  B1EventAction* eventAction = new B1EventAction(runAction);
-  SetUserAction(eventAction);
-  
-  SetUserAction(new B1SteppingAction(eventAction));
-}  
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#endif

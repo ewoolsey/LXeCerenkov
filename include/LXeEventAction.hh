@@ -23,37 +23,40 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1DetectorConstruction.hh 69565 2013-05-08 12:35:31Z gcosmo $
+// $Id: LXeEventAction.hh 93886 2015-11-03 08:28:26Z gcosmo $
 //
-/// \file B1DetectorConstruction.hh
-/// \brief Definition of the B1DetectorConstruction class
+/// \file LXeEventAction.hh
+/// \brief Definition of the LXeEventAction class
 
-#ifndef B1DetectorConstruction_h
-#define B1DetectorConstruction_h 1
+#ifndef LXeEventAction_h
+#define LXeEventAction_h 1
 
-#include "G4VUserDetectorConstruction.hh"
+#include "G4UserEventAction.hh"
 #include "globals.hh"
 
-class G4VPhysicalVolume;
-class G4LogicalVolume;
+class LXeRunAction;
 
-/// Detector construction class to define materials and geometry.
+/// Event action class
+///
 
-class B1DetectorConstruction : public G4VUserDetectorConstruction
+class LXeEventAction : public G4UserEventAction
 {
   public:
-    B1DetectorConstruction();
-    virtual ~B1DetectorConstruction();
+    LXeEventAction(LXeRunAction* runAction);
+    virtual ~LXeEventAction();
 
-    virtual G4VPhysicalVolume* Construct();
-    
-    G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+    virtual void BeginOfEventAction(const G4Event* event);
+    virtual void EndOfEventAction(const G4Event* event);
 
-  protected:
-    G4LogicalVolume*  fScoringVolume;
+    void AddEdep(G4double edep) { fEdep += edep; }
+
+  private:
+    LXeRunAction* fRunAction;
+    G4double     fEdep;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 
+    

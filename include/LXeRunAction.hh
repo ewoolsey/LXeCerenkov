@@ -23,40 +23,42 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1EventAction.hh 93886 2015-11-03 08:28:26Z gcosmo $
+// $Id: LXeRunAction.hh 99560 2016-09-27 07:03:29Z gcosmo $
 //
-/// \file B1EventAction.hh
-/// \brief Definition of the B1EventAction class
+/// \file LXeRunAction.hh
+/// \brief Definition of the LXeRunAction class
 
-#ifndef B1EventAction_h
-#define B1EventAction_h 1
+#ifndef LXeRunAction_h
+#define LXeRunAction_h 1
 
-#include "G4UserEventAction.hh"
+#include "G4UserRunAction.hh"
+#include "G4Accumulable.hh"
 #include "globals.hh"
 
-class B1RunAction;
+class G4Run;
 
-/// Event action class
+/// Run action class
 ///
+/// In EndOfRunAction(), it calculates the dose in the selected volume 
+/// from the energy deposit accumulated via stepping and event actions.
+/// The computed dose is then printed on the screen.
 
-class B1EventAction : public G4UserEventAction
+class LXeRunAction : public G4UserRunAction
 {
   public:
-    B1EventAction(B1RunAction* runAction);
-    virtual ~B1EventAction();
+    LXeRunAction();
+    virtual ~LXeRunAction();
 
-    virtual void BeginOfEventAction(const G4Event* event);
-    virtual void EndOfEventAction(const G4Event* event);
+    // virtual G4Run* GenerateRun();
+    virtual void BeginOfRunAction(const G4Run*);
+    virtual void   EndOfRunAction(const G4Run*);
 
-    void AddEdep(G4double edep) { fEdep += edep; }
+    void AddEdep (G4double edep); 
 
   private:
-    B1RunAction* fRunAction;
-    G4double     fEdep;
+    G4Accumulable<G4double> fEdep;
+    G4Accumulable<G4double> fEdep2;
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 
-    

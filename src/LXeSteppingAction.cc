@@ -23,44 +23,56 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1PrimaryGeneratorAction.hh 90623 2015-06-05 09:24:30Z gcosmo $
+// $Id: LXeSteppingAction.cc 74483 2013-10-09 13:37:06Z gcosmo $
 //
-/// \file B1PrimaryGeneratorAction.hh
-/// \brief Definition of the B1PrimaryGeneratorAction class
+/// \file LXeSteppingAction.cc
+/// \brief Implementation of the LXeSteppingAction class
 
-#ifndef B1PrimaryGeneratorAction_h
-#define B1PrimaryGeneratorAction_h 1
+#include "LXeSteppingAction.hh"
+#include "LXeEventAction.hh"
+#include "LXeDetectorConstruction.hh"
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
-#include "globals.hh"
-
-class G4ParticleGun;
-class G4Event;
-class G4Box;
-
-/// The primary generator action class with particle gun.
-///
-/// The default kinematic is a 6 MeV gamma, randomly distribued 
-/// in front of the phantom across 80% of the (X,Y) phantom size.
-
-class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
-  public:
-    B1PrimaryGeneratorAction();    
-    virtual ~B1PrimaryGeneratorAction();
-
-    // method from the base class
-    virtual void GeneratePrimaries(G4Event*);         
-  
-    // method to access particle gun
-    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
-  
-  private:
-    G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
-    G4Box* fEnvelopeBox;
-};
+#include "G4Step.hh"
+#include "G4Event.hh"
+#include "G4RunManager.hh"
+#include "G4LogicalVolume.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif
+LXeSteppingAction::LXeSteppingAction(LXeEventAction* eventAction)
+: G4UserSteppingAction(),
+  fEventAction(eventAction),
+  fScoringVolume(0)
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+LXeSteppingAction::~LXeSteppingAction()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void LXeSteppingAction::UserSteppingAction(const G4Step* step)
+{
+  if (!fScoringVolume) { 
+    const LXeDetectorConstruction* detectorConstruction
+      = static_cast<const LXeDetectorConstruction*>
+        (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+    fScoringVolume = detectorConstruction->GetScoringVolume();   
+  }
+
+  // get volume of the current step
+  G4LogicalVolume* volume 
+    = step->GetPreStepPoint()->GetTouchableHandle()
+      ->GetVolume()->GetLogicalVolume();
+      
+  // check if we are in scoring volume
+  if (volume != fScoringVolume) return;
+
+  // collect energy deposited in this step
+  G4double edepStep = step->GetTotalEnergyDeposit();
+  fEventAction->AddEdep(edepStep);  
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+

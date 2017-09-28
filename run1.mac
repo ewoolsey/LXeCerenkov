@@ -1,4 +1,5 @@
 # Macro file for example LXe
+# Written by Eric Woolsey
 # 
 # Can be run in batch, without graphic
 # or interactively: Idle> /control/execute run1.mac

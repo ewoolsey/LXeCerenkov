@@ -28,6 +28,7 @@
 /// \file LXeCerenkov.cc
 
 #include "LXeDetectorConstruction.hh"
+#include "LXePhysicsList.hh"
 #include "LXeActionInitialization.hh"
 
 #ifdef G4MULTITHREADED

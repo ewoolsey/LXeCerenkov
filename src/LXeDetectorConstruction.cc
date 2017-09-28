@@ -62,8 +62,8 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   
   // Envelope parameters
   //
-  G4double env_sizeXY = 20*cm, env_sizeZ = 30*cm;
-  G4Material* env_mat = nist->FindOrBuildMaterial("G4_WATER");
+  G4double env_sizeXY = 3*cm, env_sizeZ = 4.5*cm;
+  G4Material* env_mat = nist->FindOrBuildMaterial("G4_lXe");
    
   // Option to switch on/off checking of volumes overlaps
   //
@@ -74,7 +74,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   //
   G4double world_sizeXY = 1.2*env_sizeXY;
   G4double world_sizeZ  = 1.2*env_sizeZ;
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Fe");
   
   G4Box* solidWorld =    
     new G4Box("World",                       //its name

@@ -78,9 +78,6 @@ void LXePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // on DetectorConstruction class we get Envelope volume
   // from G4LogicalVolumeStore.
   
-  G4double envSizeXY = 0;
-  G4double envSizeZ = 0;
-
   if (!fEnvelopeBox)
   {
     G4LogicalVolume* envLV
@@ -88,10 +85,6 @@ void LXePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     if ( envLV ) fEnvelopeBox = dynamic_cast<G4Box*>(envLV->GetSolid());
   }
 
-  if ( fEnvelopeBox ) {
-    envSizeXY = fEnvelopeBox->GetXHalfLength()*2.;
-    envSizeZ = fEnvelopeBox->GetZHalfLength()*2.;
-  }  
   else  {
     G4ExceptionDescription msg;
     msg << "Envelope volume of box shape not found.\n"; 
@@ -100,12 +93,6 @@ void LXePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4Exception("LXePrimaryGeneratorAction::GeneratePrimaries()",
      "MyCode0002",JustWarning,msg);
   }
-  
-  // This should be unnecessary now
-  G4double size = 0.8; 
-  G4double x0 = size * envSizeXY * (G4UniformRand()-0.5);
-  G4double y0 = size * envSizeXY * (G4UniformRand()-0.5);
-  G4double z0 = -0.5 * envSizeZ;
   
   fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
 

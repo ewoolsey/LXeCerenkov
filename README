@@ -1,1 +1,16 @@
 A simulation for Cerenkov light production in LXe
+
+Geant 4 should be installed as per this tutorial:
+http://geant4.slac.stanford.edu/SLACTutorial14/HandsOn1/
+
+To Do List:
+Please write your name beside the project you are currently working on so we can keep track of who's doing what.
+Do not push changes that will break or weaken functionality for anyone else. If you would like to upload these changes then please create a fork.
+LOTS!
+- The physics list is basically untouched an we need to look at that. - (Eric Woolsey is working on this)
+- NEST needs to be integrated.
+- Geaometry needs to be re looked at. It is very basic and needs to be a little more sophisticated.
+- Figure out how to make sure the sensitive volumes are actually logging hits.
+- Set up a way to save relevent simulation data to a root file so it can be viewed.
+
+Feel free to write anything here that you think is relevant.

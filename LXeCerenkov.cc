@@ -24,7 +24,7 @@
 // ********************************************************************
 //
 // $Id: LXeCerenkov.cc 86065 2014-11-07 08:51:15Z gcosmo $
-//
+// written by Eric Woolsey
 /// \file LXeCerenkov.cc
 
 #include "LXeDetectorConstruction.hh"

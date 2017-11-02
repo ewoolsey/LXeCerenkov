@@ -40,6 +40,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4Tubs.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -149,17 +150,17 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
 
   G4double Package_sizeXY = 15*mm;
   G4double Package_sizeZ = 3*mm;
-  G4ThreeVector Package_pos = G4ThreeVector(0, 0, -1*Package_sizeZ/2);
+  G4ThreeVector Package_pos = G4ThreeVector(0, 0, Package_sizeZ/2);
   G4Box* SolidPackage = new G4Box("Package", Package_sizeXY/2, Package_sizeXY/2, Package_sizeZ/2);
   G4LogicalVolume* Packagelogic = new G4LogicalVolume(SolidPackage, silicon, "Package");
 
   G4double MPPC_sizeXY = 5.9*mm;
   G4double MPPC_sizeZ = 1*mm;
-  G4ThreeVector MPPC1_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
+  G4ThreeVector MPPC1_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
 //  G4ThreeVector MPPC2_pos = G4ThreeVector(0,0,0);
-  G4ThreeVector MPPC2_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
-  G4ThreeVector MPPC3_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
-  G4ThreeVector MPPC4_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
+  G4ThreeVector MPPC2_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
+  G4ThreeVector MPPC3_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
+  G4ThreeVector MPPC4_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4Box* SolidMPPC = new G4Box("MPPC", MPPC_sizeXY/2, MPPC_sizeXY/2, MPPC_sizeZ/2);
   G4LogicalVolume* MPPClogic = new G4LogicalVolume(SolidMPPC, silicon, "MPPC");
   
@@ -168,16 +169,16 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   //
 
   G4ThreeVector SiPM_Pos[10];
-  SiPM_Pos[0] = G4ThreeVector(                0,                 0,    xenon_sizeZ/2);
-  SiPM_Pos[1] = G4ThreeVector(                0,                 0, -1*xenon_sizeZ/2);
-  SiPM_Pos[2] = G4ThreeVector(   xenon_sizeXY/2,                 0,    xenon_sizeZ/4);
-  SiPM_Pos[3] = G4ThreeVector(   xenon_sizeXY/2,                 0, -1*xenon_sizeZ/4);
-  SiPM_Pos[4] = G4ThreeVector(-1*xenon_sizeXY/2,                 0,    xenon_sizeZ/4);
-  SiPM_Pos[5] = G4ThreeVector(-1*xenon_sizeXY/2,                 0, -1*xenon_sizeZ/4);  
-  SiPM_Pos[6] = G4ThreeVector(                0,    xenon_sizeXY/2,    xenon_sizeZ/4);
-  SiPM_Pos[7] = G4ThreeVector(                0,    xenon_sizeXY/2, -1*xenon_sizeZ/4);
-  SiPM_Pos[8] = G4ThreeVector(                0, -1*xenon_sizeXY/2,    xenon_sizeZ/4);
-  SiPM_Pos[9] = G4ThreeVector(                0, -1*xenon_sizeXY/2, -1*xenon_sizeZ/4);
+  SiPM_Pos[0] = G4ThreeVector(                0,                 0,    xenon_sizeZ/2 + Package_sizeZ/2);
+  SiPM_Pos[1] = G4ThreeVector(                0,                 0, -1*xenon_sizeZ/2 - Package_sizeZ/2);
+  SiPM_Pos[2] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                 0,    xenon_sizeZ/4);
+  SiPM_Pos[3] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                 0, -1*xenon_sizeZ/4);
+  SiPM_Pos[4] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                 0,    xenon_sizeZ/4);
+  SiPM_Pos[5] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                 0, -1*xenon_sizeZ/4);  
+  SiPM_Pos[6] = G4ThreeVector(                0,    xenon_sizeXY/2 + Package_sizeZ/2,    xenon_sizeZ/4);
+  SiPM_Pos[7] = G4ThreeVector(                0,    xenon_sizeXY/2 + Package_sizeZ/2, -1*xenon_sizeZ/4);
+  SiPM_Pos[8] = G4ThreeVector(                0, -1*xenon_sizeXY/2 - Package_sizeZ/2,    xenon_sizeZ/4);
+  SiPM_Pos[9] = G4ThreeVector(                0, -1*xenon_sizeXY/2 - Package_sizeZ/2, -1*xenon_sizeZ/4);
      
   G4RotationMatrix* SiPM_Rot[10];
   SiPM_Rot[0] = new G4RotationMatrix();
@@ -201,16 +202,35 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   SiPM_Rot[9] = new G4RotationMatrix();
   SiPM_Rot[9]->rotateX(90*degree);
  
-//  new G4PVPlacement(0, MPPC1_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
+  new G4PVPlacement(0, MPPC1_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
   new G4PVPlacement(0, MPPC2_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
-//  new G4PVPlacement(0, MPPC3_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
-//  new G4PVPlacement(0, MPPC4_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
+  new G4PVPlacement(0, MPPC3_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
+  new G4PVPlacement(0, MPPC4_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
 
  for (int i = 0; i < 10; i++){
-    new G4PVPlacement(SiPM_Rot[i], SiPM_Pos[i] + Package_pos.transform(*SiPM_Rot[i]), Packagelogic, "Package", logicEnv, 0, checkOverlaps);
+    new G4PVPlacement(SiPM_Rot[i], SiPM_Pos[i]/* + Package_pos.transform(*SiPM_Rot[i])*/, Packagelogic, "Package", logicEnv, 0, checkOverlaps);
   }
   //
   fScoringVolume = MPPClogic;
+
+  //
+  // Needle
+  //
+
+  G4double innerRadius = 0.5*mm;
+  G4double outerRadius = 1*mm;
+  G4double hz = xenon_sizeXY/2;
+  G4double startAngle = 0.*deg;
+  G4double spanningAngle = 360.*deg;
+
+  G4Tubs* SolidNeedle = new G4Tubs("Needle", innerRadius/2, outerRadius/2, hz/2, startAngle, spanningAngle);
+  G4RotationMatrix* Needle_Rot = new G4RotationMatrix();
+  Needle_Rot->rotateX(90*degree);
+  G4Material* steel = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL"); 
+  G4LogicalVolume* Needlelogic = new G4LogicalVolume(SolidNeedle, steel, "Needle");
+  G4ThreeVector Needle_pos = G4ThreeVector(0, hz/2, 0);
+  new G4PVPlacement(Needle_Rot, Needle_pos, Needlelogic, "Needle", logicXenon, 0, checkOverlaps);
+
 
   //
   //always return the physical World

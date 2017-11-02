@@ -29,7 +29,6 @@
 /// \brief Implementation of the LXeEventAction class
 
 
-#include "LXeTrackingAction.hh"
 #include "LXeEventAction.hh"
 #include "LXeRunAction.hh"
 

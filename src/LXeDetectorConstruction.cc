@@ -199,7 +199,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4ThreeVector MPPC3_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4ThreeVector MPPC4_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4Box* SolidMPPC = new G4Box("MPPC", MPPC_sizeXY/2, MPPC_sizeXY/2, MPPC_sizeZ/2);
-  G4LogicalVolume* MPPClogic = new G4LogicalVolume(SolidMPPC, silicon, "MPPC");
+  G4LogicalVolume* MPPClogic = new G4LogicalVolume(SolidMPPC, xenon_mat, "MPPC");
 
   //
   // SiPM Pacements

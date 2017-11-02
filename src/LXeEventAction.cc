@@ -28,6 +28,8 @@
 /// \file LXeEventAction.cc
 /// \brief Implementation of the LXeEventAction class
 
+
+#include "LXeTrackingAction.hh"
 #include "LXeEventAction.hh"
 #include "LXeRunAction.hh"
 
@@ -39,7 +41,10 @@
 LXeEventAction::LXeEventAction(LXeRunAction* runAction)
 : G4UserEventAction(),
   fRunAction(runAction),
-  fEdep(0.)
+  fEdep(0.),
+  scintEnergies(),
+  cerenEnergies()
+
 {} 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -50,16 +55,24 @@ LXeEventAction::~LXeEventAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void LXeEventAction::BeginOfEventAction(const G4Event*)
-{    
+{
   fEdep = 0.;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void LXeEventAction::EndOfEventAction(const G4Event*)
-{   
-  // accumulate statistics in run action
+{
+
   fRunAction->AddEdep(fEdep);
+  for(G4double c : cerenEnergies) {
+    fRunAction->AddCeren(c);
+  }
+  for(G4double s : scintEnergies) {
+    fRunAction->AddScint(s);
+  }
+  scintEnergies.clear();
+  cerenEnergies.clear();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

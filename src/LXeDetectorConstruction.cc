@@ -64,9 +64,44 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   // Envelope parameters
   //
   G4double env_sizeXY = 29*mm, env_sizeZ = 48*mm;
-  //G4Material* env_mat = nist->FindOrBuildMaterial("G4_lXe");
   G4Material* env_mat = nist->FindOrBuildMaterial("G4_TEFLON");
-   
+  G4Material* LXe = nist->FindOrBuildMaterial("G4_lXe");
+
+  const G4int NUMENTRIES = 20;
+  //const G4int NUMENTRIES = 9;
+  
+  //G4double LXe_PP[NUMENTRIES] = {6.6*eV,6.7*eV,6.8*eV,6.9*eV,7.0*eV, 7.1*eV,7.2*eV,7.3*eV,7.4*eV};
+  G4double LXe_PP[NUMENTRIES] = { 2.0*eV, 2.5*eV, 3.0*eV, 3.5*eV,
+                                  4.0*eV, 4.5*eV, 5.0*eV, 5.5*eV, 6.0*eV,
+                                  6.6*eV,6.7*eV,6.8*eV,6.9*eV,7.0*eV, 7.1*eV,7.2*eV,7.3*eV,7.4*eV,
+                                  7.7*eV,8.0*eV};
+  G4double LXe_SCINT[NUMENTRIES] = {0,0,0,0,0,0,0,0,0,
+                  0.000134, 0.004432, 0.053991, 0.241971, 0.398942, 0.37134, 0.32432, 0.283991,0.241971,
+                                    0.005,0.0000};// This distribution needs to be reevaluated.
+  //0.000134, 0.004432, 0.053991, 0.241971, 0.398942, 0.000134, 0.004432, 0.053991,0.241971,
+  G4double LXe_RIND[NUMENTRIES];for(int i=0;i<NUMENTRIES;i++) LXe_RIND[i] = 1.57;
+  
+  G4double LXe_ABSL[NUMENTRIES];for(int i=0;i<NUMENTRIES;i++) LXe_ABSL[i] = 35.*cm;
+  
+  G4MaterialPropertiesTable* LXe_MPT = new G4MaterialPropertiesTable();
+  
+  LXe_MPT -> AddProperty("FASTCOMPONENT",LXe_PP, LXe_SCINT, NUMENTRIES);
+  LXe_MPT -> AddProperty("SLOWCOMPONENT",LXe_PP, LXe_SCINT, NUMENTRIES);
+  LXe_MPT -> AddProperty("RINDEX", LXe_PP, LXe_RIND, NUMENTRIES);
+  LXe_MPT -> AddProperty("ABSLENGTH",LXe_PP, LXe_ABSL, NUMENTRIES);
+  LXe_MPT -> AddConstProperty("RESOLUTIONSCALE", 1.0);
+ 
+  LXe_MPT -> AddConstProperty ("SCINTILLATIONYIELD", 68000/MeV);//  was 100 before
+  LXe_MPT -> AddConstProperty("FASTTIMECONSTANT",20.*ns);
+  LXe_MPT -> AddConstProperty("SLOWTIMECONSTANT",45.*ns);
+  LXe_MPT -> AddConstProperty("YIELDRATIO",1.0);
+  
+  LXe -> SetMaterialPropertiesTable(LXe_MPT);
+  //LXe->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
+
+  G4double xenon_sizeXY = 19*mm;
+  G4double xenon_sizeZ  = 38*mm;
+  G4Material* xenon_mat = LXe;
   // Option to switch on/off checking of volumes overlaps
   //
   G4bool checkOverlaps = true;
@@ -79,8 +114,10 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   
   G4Box* solidWorld =    
-    new G4Box("World",                       //its name
-       0.5*world_sizeXY, 0.5*world_sizeXY, 0.5*world_sizeZ);     //its size
+    new G4Box("World",              //its name
+              0.5*world_sizeXY,
+              0.5*world_sizeXY,
+              0.5*world_sizeZ);     //its size
       
   G4LogicalVolume* logicWorld =                         
     new G4LogicalVolume(solidWorld,          //its solid
@@ -101,8 +138,10 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   // Envelope
   //  
   G4Box* solidEnv =    
-    new G4Box("Envelope",                    //its name
-        0.5*env_sizeXY, 0.5*env_sizeXY, 0.5*env_sizeZ); //its size
+    new G4Box("Envelope",     //its name
+              0.5*env_sizeXY,
+              0.5*env_sizeXY,
+              0.5*env_sizeZ); //its size
       
   G4LogicalVolume* logicEnv =                         
     new G4LogicalVolume(solidEnv,            //its solid
@@ -118,36 +157,28 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
 
-  //
-  // Xenon
-  //
-
-  G4double xenon_sizeXY = 19*mm;
-  G4double xenon_sizeZ  = 38*mm;
-  G4Material* xenon_mat = nist->FindOrBuildMaterial("G4_lXe");
-  
   G4Box* solidXenon =
-  new G4Box("Xenon",                    //its name
-        0.5*xenon_sizeXY, 0.5*xenon_sizeXY, 0.5*xenon_sizeZ); //its size
+          new G4Box("Xenon",          //its name
+                    0.5*xenon_sizeXY,
+                    0.5*xenon_sizeXY,
+                    0.5*xenon_sizeZ); //its size
+  G4LogicalVolume* logicXenon =
+          new G4LogicalVolume(solidXenon, //its solid
+                   xenon_mat,             //its material
+                   "Xenon");              //its name
 
-  G4LogicalVolume* logicXenon =                         
-    new G4LogicalVolume(solidXenon,             //its solid
-                        xenon_mat,             //its material
-                        "Xenon");               //its name
-
-  new G4PVPlacement(0,                       //no rotation 
-                    G4ThreeVector(),         //at (0,0,0)
-                    logicXenon,                //its logical volume
-                    "Xenon",              //its name
-                    logicEnv,              //its mother  volume
-                    false,                   //no boolean operation
-                    0,                       //copy number
-                    checkOverlaps);          //overlaps checking
+  new G4PVPlacement(0,              //no rotation
+           G4ThreeVector(),         //at (0,0,0)
+           logicXenon,              //its logical volume
+           "Xenon",                 //its name
+           logicEnv,                //its mother  volume
+           false,                   //no boolean operation
+           0,                       //copy number
+           checkOverlaps);          //overlaps checking
   //     
   // SiPM Definitions
   //  
   G4Material* silicon = nist->FindOrBuildMaterial("G4_Si");
-
   G4double Package_sizeXY = 15*mm;
   G4double Package_sizeZ = 3*mm;
   G4ThreeVector Package_pos = G4ThreeVector(0, 0, Package_sizeZ/2);
@@ -157,29 +188,29 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4double MPPC_sizeXY = 5.9*mm;
   G4double MPPC_sizeZ = 1*mm;
   G4ThreeVector MPPC1_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
-//  G4ThreeVector MPPC2_pos = G4ThreeVector(0,0,0);
+  //G4ThreeVector MPPC2_pos = G4ThreeVector(0,0,0);
   G4ThreeVector MPPC2_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4ThreeVector MPPC3_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4ThreeVector MPPC4_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ/2 - MPPC_sizeZ/2);
   G4Box* SolidMPPC = new G4Box("MPPC", MPPC_sizeXY/2, MPPC_sizeXY/2, MPPC_sizeZ/2);
   G4LogicalVolume* MPPClogic = new G4LogicalVolume(SolidMPPC, silicon, "MPPC");
-  
+
   //
   // SiPM Pacements
   //
 
   G4ThreeVector SiPM_Pos[10];
-  SiPM_Pos[0] = G4ThreeVector(                0,                 0,    xenon_sizeZ/2 + Package_sizeZ/2);
-  SiPM_Pos[1] = G4ThreeVector(                0,                 0, -1*xenon_sizeZ/2 - Package_sizeZ/2);
-  SiPM_Pos[2] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                 0,    xenon_sizeZ/4);
-  SiPM_Pos[3] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                 0, -1*xenon_sizeZ/4);
-  SiPM_Pos[4] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                 0,    xenon_sizeZ/4);
-  SiPM_Pos[5] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                 0, -1*xenon_sizeZ/4);  
-  SiPM_Pos[6] = G4ThreeVector(                0,    xenon_sizeXY/2 + Package_sizeZ/2,    xenon_sizeZ/4);
-  SiPM_Pos[7] = G4ThreeVector(                0,    xenon_sizeXY/2 + Package_sizeZ/2, -1*xenon_sizeZ/4);
-  SiPM_Pos[8] = G4ThreeVector(                0, -1*xenon_sizeXY/2 - Package_sizeZ/2,    xenon_sizeZ/4);
-  SiPM_Pos[9] = G4ThreeVector(                0, -1*xenon_sizeXY/2 - Package_sizeZ/2, -1*xenon_sizeZ/4);
-     
+  SiPM_Pos[0] = G4ThreeVector(                                  0,                                   0,    xenon_sizeZ/2 + Package_sizeZ/2);
+  SiPM_Pos[1] = G4ThreeVector(                                  0,                                   0, -1*xenon_sizeZ/2 - Package_sizeZ/2);
+  SiPM_Pos[2] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                                   0,    xenon_sizeZ/4);
+  SiPM_Pos[3] = G4ThreeVector(   xenon_sizeXY/2 + Package_sizeZ/2,                                   0, -1*xenon_sizeZ/4);
+  SiPM_Pos[4] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                                   0,    xenon_sizeZ/4);
+  SiPM_Pos[5] = G4ThreeVector(-1*xenon_sizeXY/2 - Package_sizeZ/2,                                   0, -1*xenon_sizeZ/4);
+  SiPM_Pos[6] = G4ThreeVector(                                  0,    xenon_sizeXY/2 + Package_sizeZ/2,    xenon_sizeZ/4);
+  SiPM_Pos[7] = G4ThreeVector(                                  0,    xenon_sizeXY/2 + Package_sizeZ/2, -1*xenon_sizeZ/4);
+  SiPM_Pos[8] = G4ThreeVector(                                  0, -1*xenon_sizeXY/2 - Package_sizeZ/2,    xenon_sizeZ/4);
+  SiPM_Pos[9] = G4ThreeVector(                                  0, -1*xenon_sizeXY/2 - Package_sizeZ/2, -1*xenon_sizeZ/4);
+
   G4RotationMatrix* SiPM_Rot[10];
   SiPM_Rot[0] = new G4RotationMatrix();
   SiPM_Rot[0]->rotateX(180*degree);
@@ -201,15 +232,16 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   SiPM_Rot[8]->rotateX(90*degree);
   SiPM_Rot[9] = new G4RotationMatrix();
   SiPM_Rot[9]->rotateX(90*degree);
- 
+
   new G4PVPlacement(0, MPPC1_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
   new G4PVPlacement(0, MPPC2_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
   new G4PVPlacement(0, MPPC3_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
   new G4PVPlacement(0, MPPC4_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
 
- for (int i = 0; i < 10; i++){
-    new G4PVPlacement(SiPM_Rot[i], SiPM_Pos[i]/* + Package_pos.transform(*SiPM_Rot[i])*/, Packagelogic, "Package", logicEnv, 0, checkOverlaps);
+  for (int i = 0; i < 10; i++){
+  new G4PVPlacement(SiPM_Rot[i], SiPM_Pos[i]/* + Package_pos.transform(*SiPM_Rot[i])*/, Packagelogic, "Package", logicEnv, 0, checkOverlaps);
   }
+
   //
   fScoringVolume = MPPClogic;
 
@@ -226,7 +258,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4Tubs* SolidNeedle = new G4Tubs("Needle", innerRadius/2, outerRadius/2, hz/2, startAngle, spanningAngle);
   G4RotationMatrix* Needle_Rot = new G4RotationMatrix();
   Needle_Rot->rotateX(90*degree);
-  G4Material* steel = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL"); 
+  G4Material* steel = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
   G4LogicalVolume* Needlelogic = new G4LogicalVolume(SolidNeedle, steel, "Needle");
   G4ThreeVector Needle_pos = G4ThreeVector(0, hz/2, 0);
   new G4PVPlacement(Needle_Rot, Needle_pos, Needlelogic, "Needle", logicXenon, 0, checkOverlaps);

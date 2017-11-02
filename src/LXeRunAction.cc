@@ -41,12 +41,17 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 
 LXeRunAction::LXeRunAction()
 : G4UserRunAction(),
   fEdep(0.),
-  fEdep2(0.)
+  fEdep2(0.),
+  scintillationEnergies(0.),
+  cerenkovEnergies(0.)
 { 
   // add new units for dose
   // 
@@ -63,7 +68,9 @@ LXeRunAction::LXeRunAction()
   // Register accumulable to the accumulable manager
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->RegisterAccumulable(fEdep);
-  accumulableManager->RegisterAccumulable(fEdep2); 
+  accumulableManager->RegisterAccumulable(fEdep2);
+  accumulableManager->RegisterAccumulable(&scintillationEnergies);
+  accumulableManager->RegisterAccumulable(&cerenkovEnergies);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -74,11 +81,14 @@ LXeRunAction::~LXeRunAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void LXeRunAction::BeginOfRunAction(const G4Run*)
-{ 
+{
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 
   // reset accumulables to their initial values
+
+
+  // possibly use this to store energies until they are ready to be written?
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
 
@@ -86,8 +96,35 @@ void LXeRunAction::BeginOfRunAction(const G4Run*)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void LXeRunAction::storeEnergies(const char *type) {
+  if (type == "cerenkov") {
+    std::vector<G4double> cerenEnergies = cerenkovEnergies.getEnergies();
+    unsigned long nC = cerenEnergies.size();
+    std::ofstream cerenOut;
+
+    cerenOut.open("cerenkovEnergies.csv", std::ios::app);
+    for (unsigned long i = 0; i < nC; i++) {
+      cerenOut << cerenEnergies[i] << ",";
+    }
+    cerenOut.close();
+  }
+  else if (type == "scintillation") {
+    std::vector<G4double> scintEnergies = scintillationEnergies.getEnergies();
+    unsigned long nS = scintEnergies.size();
+    std::ofstream scintOut;
+
+    scintOut.open("scintillationEnergies.csv", std::ios::app);
+    for (unsigned long i = 0; i < nS; i++) {
+      scintOut << scintEnergies[i] << ",";
+    }
+    scintOut.close();
+  }
+}
+
+
 void LXeRunAction::EndOfRunAction(const G4Run* run)
 {
+
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
 
@@ -132,6 +169,8 @@ void LXeRunAction::EndOfRunAction(const G4Run* run)
     G4cout
      << G4endl
      << "--------------------End of Global Run-----------------------";
+    storeEnergies("cerenkov");
+    storeEnergies("scintillation");
   }
   else {
     G4cout
@@ -159,6 +198,21 @@ void LXeRunAction::AddEdep(G4double edep)
   fEdep2 += edep*edep;
 }
 
+void LXeRunAction::AddScint(G4double scintEnergy) {
+  scintillationEnergies.AddEnergy(scintEnergy);
+  unsigned long nums = scintillationEnergies.getLength();
+  if (nums>=500000){
+    storeEnergies("scintillation");
+    scintillationEnergies.Reset();
+  }
+}
 
+void LXeRunAction::AddCeren(G4double cerenEnergy) {
+  cerenkovEnergies.AddEnergy(cerenEnergy);
+  unsigned long nums = cerenkovEnergies.getLength();
+  if (nums>=500000){
+    storeEnergies("cerenkov");
+    cerenkovEnergies.Reset();
+  }
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

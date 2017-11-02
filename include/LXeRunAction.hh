@@ -34,6 +34,7 @@
 #include "G4UserRunAction.hh"
 #include "G4Accumulable.hh"
 #include "globals.hh"
+#include "EnergyAccumulable.hh"
 
 class G4Run;
 
@@ -53,11 +54,16 @@ class LXeRunAction : public G4UserRunAction
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
 
-    void AddEdep (G4double edep); 
+    void storeEnergies(const char *type);
+    void AddEdep (G4double edep);
+    void AddScint (G4double scintEnergy);
+    void AddCeren (G4double cerenEnergy);
 
   private:
     G4Accumulable<G4double> fEdep;
     G4Accumulable<G4double> fEdep2;
+    EnergyAccumulable cerenkovEnergies;
+    EnergyAccumulable scintillationEnergies;
 };
 
 #endif

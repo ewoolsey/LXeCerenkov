@@ -54,8 +54,9 @@ LXePrimaryGeneratorAction::LXePrimaryGeneratorAction()
   G4String particleName;
   G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e-");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,0.));
-  fParticleGun->SetParticleEnergy(10.546*MeV);
+  fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleEnergy(2.5*MeV);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -71,9 +72,6 @@ void LXePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   //this function is called at the begining of ecah event
   //
-
-  fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
-
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 

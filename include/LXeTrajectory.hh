@@ -23,50 +23,65 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: LXeEventAction.hh 93886 2015-11-03 08:28:26Z gcosmo $
+// $Id: LXeTrajectory.hh 72349 2013-07-16 12:13:16Z gcosmo $
 //
-/// \file LXeEventAction.hh
-/// \brief Definition of the LXeEventAction class
+/// \file optical/LXe/include/LXeTrajectory.hh
+/// \brief Definition of the LXeTrajectory class
+//
+#ifndef LXeTrajectory_h
+#define LXeTrajectory_h 1
 
-#ifndef LXeEventAction_h
-#define LXeEventAction_h 1
-
-#include "G4UserEventAction.hh"
+#include "G4Trajectory.hh"
+#include "G4Allocator.hh"
+#include "G4ios.hh"
 #include "globals.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4TrajectoryPoint.hh"
+#include "G4Track.hh"
 #include "G4Step.hh"
-class LXeRunAction;
-//class G4Step;
 
-/// Event action class
-///
+class G4Polyline;                   // Forward declaration.
 
-
-
-
-class LXeEventAction : public G4UserEventAction
+class LXeTrajectory : public G4Trajectory
 {
   public:
-    LXeEventAction(LXeRunAction* runAction);
-    virtual ~LXeEventAction();
 
-    virtual void BeginOfEventAction(const G4Event* event);
-    virtual void EndOfEventAction(const G4Event* event);
+    LXeTrajectory();
+    LXeTrajectory(const G4Track* aTrack);
+    LXeTrajectory(LXeTrajectory &);
+    virtual ~LXeTrajectory();
+ 
+    virtual void DrawTrajectory() const;
+ 
+    inline void* operator new(size_t);
+    inline void  operator delete(void*);
 
-    void AddEdep(G4double edep) { fEdep += edep; }
+    void SetDrawTrajectory(G4bool b){fDrawit=b;}
+    void WLS(){fWls=true;}
+    void SetForceDrawTrajectory(G4bool b){fForceDraw=b;}
+    void SetForceNoDrawTrajectory(G4bool b){fForceNoDraw=b;}
 
-    void AddCeren(G4double NRG){ cerenEnergies.push_back(NRG); }
+  private:
 
-    void AddScint(G4double NRG){ scintEnergies.push_back(NRG); }
-private:
-    LXeRunAction* fRunAction;
-    //G4Step* fStep;
-    std::vector<G4double> scintEnergies;
-    std::vector<G4double> cerenEnergies;
-    G4double     fEdep;
+    G4bool fWls;
+    G4bool fDrawit;
+    G4bool fForceNoDraw;
+    G4bool fForceDraw;
+    G4ParticleDefinition* fParticleDefinition;
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+extern G4ThreadLocal G4Allocator<LXeTrajectory>* LXeTrajectoryAllocator;
+
+inline void* LXeTrajectory::operator new(size_t)
+{
+  if(!LXeTrajectoryAllocator)
+      LXeTrajectoryAllocator = new G4Allocator<LXeTrajectory>;
+  return (void*)LXeTrajectoryAllocator->MallocSingle();
+}
+
+inline void LXeTrajectory::operator delete(void* aTrajectory)
+{
+  LXeTrajectoryAllocator->FreeSingle((LXeTrajectory*)aTrajectory);
+}
 
 #endif
-
-    

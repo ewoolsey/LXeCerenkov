@@ -35,14 +35,9 @@
 #include "globals.hh"
 #include "G4Step.hh"
 class LXeRunAction;
-//class G4Step;
 
 /// Event action class
 ///
-
-
-
-
 class LXeEventAction : public G4UserEventAction
 {
   public:
@@ -59,10 +54,9 @@ class LXeEventAction : public G4UserEventAction
     void AddScint(G4double NRG){ scintEnergies.push_back(NRG); }
 private:
     LXeRunAction* fRunAction;
-    //G4Step* fStep;
+    G4double     fEdep;
     std::vector<G4double> scintEnergies;
     std::vector<G4double> cerenEnergies;
-    G4double     fEdep;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

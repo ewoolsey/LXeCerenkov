@@ -155,8 +155,8 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
 
   G4double MPPC_sizeXY = 5.9*mm;
   G4double MPPC_sizeZ = 1*mm;
-//  G4ThreeVector MPPC1_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
-  G4ThreeVector MPPC1_pos = G4ThreeVector(0,0,0);
+  G4ThreeVector MPPC1_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
+//  G4ThreeVector MPPC2_pos = G4ThreeVector(0,0,0);
   G4ThreeVector MPPC2_pos = G4ThreeVector(   (MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
   G4ThreeVector MPPC3_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm), -1*(MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
   G4ThreeVector MPPC4_pos = G4ThreeVector(-1*(MPPC_sizeXY/2+0.5*mm),    (MPPC_sizeXY/2+0.5*mm), Package_sizeZ - MPPC_sizeZ/2);
@@ -201,8 +201,8 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   SiPM_Rot[9] = new G4RotationMatrix();
   SiPM_Rot[9]->rotateX(90*degree);
  
-  new G4PVPlacement(0, MPPC1_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
-//  new G4PVPlacement(0, MPPC2_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
+//  new G4PVPlacement(0, MPPC1_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
+  new G4PVPlacement(0, MPPC2_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
 //  new G4PVPlacement(0, MPPC3_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
 //  new G4PVPlacement(0, MPPC4_pos, MPPClogic, "MPPC", Packagelogic, 0, checkOverlaps);
 

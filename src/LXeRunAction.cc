@@ -96,7 +96,7 @@ void LXeRunAction::BeginOfRunAction(const G4Run*)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void LXeRunAction::storeEnergies(const char *type) {
+void LXeRunAction::storeEnergies(std::string type) {
   if (type == "cerenkov") {
     std::vector<G4double> cerenEnergies = cerenkovEnergies.getEnergies();
     unsigned long nC = cerenEnergies.size();

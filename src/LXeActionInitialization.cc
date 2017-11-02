@@ -33,7 +33,7 @@
 #include "LXeRunAction.hh"
 #include "LXeEventAction.hh"
 #include "LXeSteppingAction.hh"
-#include "LXeTrackingAction.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LXeActionInitialization::LXeActionInitialization()
@@ -66,7 +66,6 @@ void LXeActionInitialization::Build() const
   SetUserAction(eventAction);
   
   SetUserAction(new LXeSteppingAction(eventAction));
-  SetUserAction(new LXeTrackingAction());
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

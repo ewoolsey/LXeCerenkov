@@ -28,6 +28,7 @@
 /// \file LXeDetectorConstruction.cc
 /// \brief Implementation of the LXeDetectorConstruction class
 
+
 #include "LXeDetectorConstruction.hh"
 
 #include "G4RunManager.hh"
@@ -42,6 +43,9 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Tubs.hh"
 
+#include "G4OpticalSurface.hh"
+#include "G4LogicalBorderSurface.hh"
+#include "G4LogicalSkinSurface.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LXeDetectorConstruction::LXeDetectorConstruction()
@@ -57,17 +61,15 @@ LXeDetectorConstruction::~LXeDetectorConstruction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* LXeDetectorConstruction::Construct()
-{  
+{
+  const G4int NUMENTRIES = 20;
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
   
   // Envelope parameters
   //
-  G4double env_sizeXY = 29*mm, env_sizeZ = 48*mm;
-  G4Material* env_mat = nist->FindOrBuildMaterial("G4_TEFLON");
-  G4Material* LXe = nist->FindOrBuildMaterial("G4_lXe");
 
-  const G4int NUMENTRIES = 20;
+  G4Material* LXe = nist->FindOrBuildMaterial("G4_lXe");
   //const G4int NUMENTRIES = 9;
   
   //G4double LXe_PP[NUMENTRIES] = {6.6*eV,6.7*eV,6.8*eV,6.9*eV,7.0*eV, 7.1*eV,7.2*eV,7.3*eV,7.4*eV};
@@ -84,7 +86,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4double LXe_ABSL[NUMENTRIES];for(int i=0;i<NUMENTRIES;i++) LXe_ABSL[i] = 35.*cm;
   
   G4MaterialPropertiesTable* LXe_MPT = new G4MaterialPropertiesTable();
-  
+
   LXe_MPT -> AddProperty("FASTCOMPONENT",LXe_PP, LXe_SCINT, NUMENTRIES);
   LXe_MPT -> AddProperty("SLOWCOMPONENT",LXe_PP, LXe_SCINT, NUMENTRIES);
   LXe_MPT -> AddProperty("RINDEX", LXe_PP, LXe_RIND, NUMENTRIES);
@@ -99,8 +101,6 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   LXe -> SetMaterialPropertiesTable(LXe_MPT);
   //LXe->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
-  G4double xenon_sizeXY = 19*mm;
-  G4double xenon_sizeZ  = 38*mm;
   G4Material* xenon_mat = LXe;
   // Option to switch on/off checking of volumes overlaps
   //
@@ -136,7 +136,10 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
                      
   //     
   // Envelope
-  //  
+  //
+  G4double env_sizeXY = 29*mm, env_sizeZ = 48*mm;
+  G4Material* env_mat = nist->FindOrBuildMaterial("G4_TEFLON");
+
   G4Box* solidEnv =    
     new G4Box("Envelope",     //its name
               0.5*env_sizeXY,
@@ -157,6 +160,8 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
 
+  G4double xenon_sizeXY = 19*mm;
+  G4double xenon_sizeZ  = 38*mm;
   G4Box* solidXenon =
           new G4Box("Xenon",          //its name
                     0.5*xenon_sizeXY,
@@ -179,6 +184,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   // SiPM Definitions
   //  
   G4Material* silicon = nist->FindOrBuildMaterial("G4_Si");
+
   G4double Package_sizeXY = 15*mm;
   G4double Package_sizeZ = 3*mm;
   G4ThreeVector Package_pos = G4ThreeVector(0, 0, Package_sizeZ/2);
@@ -263,7 +269,24 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4ThreeVector Needle_pos = G4ThreeVector(0, hz/2, 0);
   new G4PVPlacement(Needle_Rot, Needle_pos, Needlelogic, "Needle", logicXenon, 0, checkOverlaps);
 
+  //
+  // Surfaces
+  //
 
+  G4OpticalSurface* OpTeflonSurface = new G4OpticalSurface("TeflonSurface");
+  OpTeflonSurface->SetModel(glisur);
+  OpTeflonSurface->SetType(dielectric_metal);
+  OpTeflonSurface->SetFinish(ground);
+  // Below allows G4 to check boundaries in postStep to allow reflection.
+  // Currently still reflecting when hitting a detector (flush with box?)
+  G4LogicalSkinSurface* TeflonSurface = // Not really unused
+          new G4LogicalSkinSurface("TeflonSurface",logicEnv,OpTeflonSurface);
+  G4double reflectivity[NUMENTRIES];for(double &r: reflectivity) r=0.99; // 99% Reflective
+  G4double efficiency[NUMENTRIES];for(double &r: efficiency) r=1.0; // Perfect efficiency
+  G4MaterialPropertiesTable* TeflonTable = new G4MaterialPropertiesTable();
+  TeflonTable->AddProperty("REFLECTIVITY",LXe_PP,reflectivity,NUMENTRIES);
+  TeflonTable->AddProperty("EFFICIENCY",LXe_PP,efficiency,NUMENTRIES);
+  OpTeflonSurface->SetMaterialPropertiesTable(TeflonTable);
   //
   //always return the physical World
   //

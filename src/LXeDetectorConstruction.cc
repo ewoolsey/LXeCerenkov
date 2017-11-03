@@ -31,6 +31,9 @@
 
 #include "LXeDetectorConstruction.hh"
 
+#include "LXeTrackerSD.hh"
+#include "G4SDManager.hh"
+
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
 #include "G4Box.hh"
@@ -248,10 +251,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   new G4PVPlacement(SiPM_Rot[i], SiPM_Pos[i]/* + Package_pos.transform(*SiPM_Rot[i])*/, Packagelogic, "Package", logicEnv, 0, checkOverlaps);
   }
 
-  //
-  fScoringVolume = MPPClogic;
-
-  //
+    //
   // Needle
   //
 
@@ -287,6 +287,24 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   TeflonTable->AddProperty("REFLECTIVITY",LXe_PP,reflectivity,NUMENTRIES);
   TeflonTable->AddProperty("EFFICIENCY",LXe_PP,efficiency,NUMENTRIES);
   OpTeflonSurface->SetMaterialPropertiesTable(TeflonTable);
+
+  //
+  //Sensitive Detectors
+  //
+
+  fScoringVolume = MPPClogic;
+
+  G4String trackerChamberSDname = "TrackerChamberSD";
+  LXeTrackerSD* aTrackerSD = new LXeTrackerSD(trackerChamberSDname,
+                                            "TrackerHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
+  // Setting aTrackerSD to all logical volumes with the same name 
+  // of "Chamber_LV".
+  SetSensitiveDetector("MPPClogic", aTrackerSD, true);
+
+
+
+
   //
   //always return the physical World
   //

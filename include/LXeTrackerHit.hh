@@ -23,13 +23,10 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B2TrackerHit.hh 69706 2013-05-13 09:12:40Z gcosmo $
-//
-/// \file B2TrackerHit.hh
-/// \brief Definition of the B2TrackerHit class
 
-#ifndef B2TrackerHit_h
-#define B2TrackerHit_h 1
+
+#ifndef LXeTrackerHit_h
+#define LXeTrackerHit_h 1
 
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
@@ -43,16 +40,16 @@
 /// and position of charged particles in a selected volume:
 /// - fTrackID, fChamberNB, fEdep, fPos
 
-class B2TrackerHit : public G4VHit
+class LXeTrackerHit : public G4VHit
 {
   public:
-    B2TrackerHit();
-    B2TrackerHit(const B2TrackerHit&);
-    virtual ~B2TrackerHit();
+    LXeTrackerHit();
+    LXeTrackerHit(const LXeTrackerHit&);
+    virtual ~LXeTrackerHit();
 
     // operators
-    const B2TrackerHit& operator=(const B2TrackerHit&);
-    G4int operator==(const B2TrackerHit&) const;
+    const LXeTrackerHit& operator=(const LXeTrackerHit&);
+    G4int operator==(const LXeTrackerHit&) const;
 
     inline void* operator new(size_t);
     inline void  operator delete(void*);
@@ -83,24 +80,24 @@ class B2TrackerHit : public G4VHit
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-typedef G4THitsCollection<B2TrackerHit> B2TrackerHitsCollection;
+typedef G4THitsCollection<LXeTrackerHit> LXeTrackerHitsCollection;
 
-extern G4ThreadLocal G4Allocator<B2TrackerHit>* B2TrackerHitAllocator;
+extern G4ThreadLocal G4Allocator<LXeTrackerHit>* LXeTrackerHitAllocator;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline void* B2TrackerHit::operator new(size_t)
+inline void* LXeTrackerHit::operator new(size_t)
 {
-  if(!B2TrackerHitAllocator)
-      B2TrackerHitAllocator = new G4Allocator<B2TrackerHit>;
-  return (void *) B2TrackerHitAllocator->MallocSingle();
+  if(!LXeTrackerHitAllocator)
+      LXeTrackerHitAllocator = new G4Allocator<LXeTrackerHit>;
+  return (void *) LXeTrackerHitAllocator->MallocSingle();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline void B2TrackerHit::operator delete(void *hit)
+inline void LXeTrackerHit::operator delete(void *hit)
 {
-  B2TrackerHitAllocator->FreeSingle((B2TrackerHit*) hit);
+  LXeTrackerHitAllocator->FreeSingle((LXeTrackerHit*) hit);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

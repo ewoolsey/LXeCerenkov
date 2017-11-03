@@ -32,6 +32,9 @@
 #include "LXePhysicsList.hh"
 #include "LXeActionInitialization.hh"
 
+#include "LXeTrackerHit.hh"
+#include "LXeTrackerSD.hh"
+
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else

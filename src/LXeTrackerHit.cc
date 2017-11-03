@@ -23,85 +23,91 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B2TrackerSD.cc 87359 2014-12-01 16:04:27Z gcosmo $
-//
-/// \file B2TrackerSD.cc
-/// \brief Implementation of the B2TrackerSD class
 
-#include "B2TrackerSD.hh"
-#include "G4HCofThisEvent.hh"
-#include "G4Step.hh"
-#include "G4ThreeVector.hh"
-#include "G4SDManager.hh"
-#include "G4ios.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "LXeTrackerHit.hh"
+#include "G4UnitsTable.hh"
+#include "G4VVisManager.hh"
+#include "G4Circle.hh"
+#include "G4Colour.hh"
+#include "G4VisAttributes.hh"
 
-B2TrackerSD::B2TrackerSD(const G4String& name,
-                         const G4String& hitsCollectionName) 
- : G4VSensitiveDetector(name),
-   fHitsCollection(NULL)
-{
-  collectionName.insert(hitsCollectionName);
-}
+#include <iomanip>
+
+G4ThreadLocal G4Allocator<LXeTrackerHit>* LXeTrackerHitAllocator=0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B2TrackerSD::~B2TrackerSD() 
+LXeTrackerHit::LXeTrackerHit()
+ : G4VHit(),
+   fTrackID(-1),
+   fChamberNb(-1),
+   fEdep(0.),
+   fPos(G4ThreeVector())
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B2TrackerSD::Initialize(G4HCofThisEvent* hce)
+LXeTrackerHit::~LXeTrackerHit() {}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+LXeTrackerHit::LXeTrackerHit(const LXeTrackerHit& right)
+  : G4VHit()
 {
-  // Create hits collection
-
-  fHitsCollection 
-    = new B2TrackerHitsCollection(SensitiveDetectorName, collectionName[0]); 
-
-  // Add this collection in hce
-
-  G4int hcID 
-    = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
-  hce->AddHitsCollection( hcID, fHitsCollection ); 
+  fTrackID   = right.fTrackID;
+  fChamberNb = right.fChamberNb;
+  fEdep      = right.fEdep;
+  fPos       = right.fPos;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4bool B2TrackerSD::ProcessHits(G4Step* aStep, 
-                                     G4TouchableHistory*)
-{  
-  // energy deposit
-  G4double edep = aStep->GetTotalEnergyDeposit();
+const LXeTrackerHit& LXeTrackerHit::operator=(const LXeTrackerHit& right)
+{
+  fTrackID   = right.fTrackID;
+  fChamberNb = right.fChamberNb;
+  fEdep      = right.fEdep;
+  fPos       = right.fPos;
 
-  if (edep==0.) return false;
-
-  B2TrackerHit* newHit = new B2TrackerHit();
-
-  newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
-  newHit->SetChamberNb(aStep->GetPreStepPoint()->GetTouchableHandle()
-                                               ->GetCopyNumber());
-  newHit->SetEdep(edep);
-  newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
-
-  fHitsCollection->insert( newHit );
-
-  //newHit->Print();
-
-  return true;
+  return *this;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B2TrackerSD::EndOfEvent(G4HCofThisEvent*)
+G4int LXeTrackerHit::operator==(const LXeTrackerHit& right) const
 {
-  if ( verboseLevel>1 ) { 
-     G4int nofHits = fHitsCollection->entries();
-     G4cout << G4endl
-            << "-------->Hits Collection: in this event they are " << nofHits 
-            << " hits in the tracker chambers: " << G4endl;
-     for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
+  return ( this == &right ) ? 1 : 0;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void LXeTrackerHit::Draw()
+{
+  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+  if(pVVisManager)
+  {
+    G4Circle circle(fPos);
+    circle.SetScreenSize(4.);
+    circle.SetFillStyle(G4Circle::filled);
+    G4Colour colour(1.,0.,0.);
+    G4VisAttributes attribs(colour);
+    circle.SetVisAttributes(attribs);
+    pVVisManager->Draw(circle);
   }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void LXeTrackerHit::Print()
+{
+  G4cout
+     << "  trackID: " << fTrackID << " chamberNb: " << fChamberNb
+     << "Edep: "
+     << std::setw(7) << G4BestUnit(fEdep,"Energy")
+     << " Position: "
+     << std::setw(7) << G4BestUnit( fPos,"Length")
+     << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -8,6 +8,8 @@
 #include "G4VAccumulable.hh"
 #include "globals.hh"
 #include <map>
+#include <vector>
+
 class EnergyAccumulable : public G4VAccumulable
 {
 public:

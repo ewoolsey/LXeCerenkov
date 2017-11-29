@@ -300,7 +300,7 @@ G4VPhysicalVolume* LXeDetectorConstruction::Construct()
   G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
   // Setting aTrackerSD to all logical volumes with the same name 
   // of "Chamber_LV".
-  SetSensitiveDetector("MPPClogic", aTrackerSD, true);
+  SetSensitiveDetector("MPPC", aTrackerSD, true);
 
 
 
